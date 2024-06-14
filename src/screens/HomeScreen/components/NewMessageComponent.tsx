@@ -5,51 +5,48 @@ import { View } from 'react-native';
 import { auth, dbRealTime } from '../../../configs/firebaseConfig';
 import { push, ref, set } from 'firebase/database';
 
-//Interface - props | propiedades
+
 interface Props {
     showModalMessage: boolean;
     setShowModalMessage: Function;
 }
 
-//interface - fomrulario mensajes
+
 interface FormMessage {
-    to: string;
-    subject: string;
+    email: string;
     message: string;
 }
 
 export const NewMessageComponent = ({ showModalMessage, setShowModalMessage }: Props) => {
 
     const [formMessage, setFormMessage] = useState<FormMessage>({
-        to: '',
-        subject: '',
+        email: auth.currentUser?.email || '',
         message: ''
     });
 
-    //Función cambiar los datos del formulario
+    
     const handlerSetValues = (key: string, value: string) => {
         setFormMessage({ ...formMessage, [key]: value })
     }
 
-    //Función guardar los mensajes
+    
     const handlerSaveMessage = async () => {
-        if (!formMessage.to || !formMessage.subject || !formMessage.message) {
+        if (!formMessage.message) {
             return;
         }
-        //console.log(formMessage);  
-        //Almacenar los mensajes en BDD
-        //1. Crear la referencia a la BDD - nombre tabla
+        
+        
+        
         const dbRef = ref(dbRealTime, 'messages/' + auth.currentUser?.uid);
-        //2. Crear colección - mensajes (enrutando)
+        
         const saveMessage = push(dbRef);
-        //3. Guardar mensajes
+        
         try {
             await set(saveMessage, formMessage);
-            //4. Limpiar el formulario
+            
             setFormMessage({
-                message: '',
-                subject: '',
-                to: ''
+                email: auth.currentUser?.email || '',
+                message: ''
             })
         } catch (ex) {
             console.log(ex);
@@ -71,15 +68,13 @@ export const NewMessageComponent = ({ showModalMessage, setShowModalMessage }: P
                 </View>
                 <Divider />
                 <TextInput
-                    label='Para'
+                    label='Email'
                     mode='outlined'
-                    onChangeText={(value) => handlerSetValues('to', value)} />
+                    value={formMessage.email}
+                    disabled={true}
+                />
                 <TextInput
-                    label='Asunto'
-                    mode='outlined'
-                    onChangeText={(value) => handlerSetValues('subject', value)} />
-                <TextInput
-                    label='Mensaje'
+                    label='Mensaje sobre el Instituto ITSQMET'
                     mode='outlined'
                     multiline={true}
                     numberOfLines={7}

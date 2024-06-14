@@ -1,66 +1,56 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { Button, Divider, Text, TextInput } from 'react-native-paper';
-import { styles } from '../../theme/styles';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { Message } from './HomeScreen';
 import { ref, remove, update } from 'firebase/database';
-import { dbRealTime } from '../../configs/firebaseConfig';
+import { auth, dbRealTime } from '../../configs/firebaseConfig';
+import { styles } from '../../theme/styles';
 
 export const DetailMessageScreen = () => {
-    //hook para capturar los parametros mediante navegación
     const route = useRoute();
     //@ts-ignore
     const { message } = route.params;
-    //console.log(message);
 
-    //hook useState: manipular el formulario
     const [editFormMessage, setEditFormMessage] = useState<Message>({
         id: '',
-        to: '',
-        subject: '',
-        message: ''
-    })
+        email: '',
+        message: '',
+    });
 
-    //hook useEffect: Mostrar la información recibida en el formulario
-    useEffect(() => {
-        setEditFormMessage(message)
-    }, [])
-
-    //hook navegación
     const navigation = useNavigation();
 
-    //Funición: cambiar los datos del formulario
+    useEffect(() => {
+        setEditFormMessage(message);
+    }, []);
+
     const handlerSetValues = (key: string, value: string) => {
-        setEditFormMessage({ ...editFormMessage, [key]: value })
-    }
+        setEditFormMessage({ ...editFormMessage, [key]: value });
+    };
 
-    //Función actualizar la data del mensaje
     const handlerUpdateMessage = async () => {
-        //1. Referencia a al BDD - tabla
-        const dbRef = ref(dbRealTime, 'messages/' + editFormMessage.id)
-        //2. Actualizar data
-        await update(dbRef, { message: editFormMessage.message })
+        const dbRef = ref(dbRealTime, 'messages/' + editFormMessage.id);
+        await update(dbRef, { message: editFormMessage.message });
         navigation.goBack();
-    }
+    };
 
-    //Función eliminar la data del mensaje
     const handlerDeleteMessage = async () => {
-        //1. Referencia a la BDD - tabla
-        const dbRef = ref(dbRealTime, 'messages/' + editFormMessage.id)
-        //2. Eliminar data
+        const dbRef = ref(dbRealTime, 'messages/' + editFormMessage.id);
         await remove(dbRef);
         navigation.goBack();
-    }
+    };
+
+    
+    const isOwner = editFormMessage.email === auth.currentUser?.email;
 
     return (
         <View style={styles.rootDetail}>
             <View>
-                <Text variant='headlineSmall'>Asunto: {editFormMessage.subject}</Text>
+                <Text variant='headlineSmall'>Mensaje</Text>
                 <Divider />
             </View>
             <View>
-                <Text variant='bodyLarge'>Para: {editFormMessage.to}</Text>
+                <Text variant='bodyLarge'>Correo: {editFormMessage.email}</Text>
                 <Divider />
             </View>
             <View style={{ gap: 20 }}>
@@ -69,16 +59,24 @@ export const DetailMessageScreen = () => {
                     value={editFormMessage.message}
                     multiline={true}
                     numberOfLines={5}
-                    onChangeText={(value) => handlerSetValues('message', value)} />
+                    onChangeText={(value) => handlerSetValues('message', value)}
+                    editable={isOwner} 
+                />
             </View>
-            <Button
-                mode='contained'
-                icon='email-sync'
-                onPress={handlerUpdateMessage}>Actualizar</Button>
-            <Button
-                mode='contained'
-                icon='email-remove'
-                onPress={handlerDeleteMessage}>Eliminar</Button>
+            {isOwner && (
+                <>
+                    <Button
+                        mode='contained'
+                        onPress={handlerUpdateMessage}>
+                        Actualizar
+                    </Button>
+                    <Button
+                        mode='contained'
+                        onPress={handlerDeleteMessage}>
+                        Eliminar
+                    </Button>
+                </>
+            )}
         </View>
     )
 }

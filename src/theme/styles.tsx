@@ -70,6 +70,33 @@ export const styles = StyleSheet.create({
     iconSignOut: {
         marginTop: 25,
         alignItems: 'center'
-    }
+    },
+    card: {
+        backgroundColor: 'white',
+        padding: 10,
+        marginBottom: 10,
+        borderRadius: 8,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        marginTop: 10,
+        gap:5
+    },
+    cardContent: {
+        flex: 1,
+        marginTop: 10,
+        gap:5
+    },
+    cardLabel: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    cardMessage: {
+        fontSize: 14,
+        marginTop: 5,
+    },
+    cardIcon: {
+        marginLeft: 10,
+    },
 
 })

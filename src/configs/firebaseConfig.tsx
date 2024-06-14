@@ -9,13 +9,13 @@ import { getDatabase } from 'firebase/database';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyD6Oly-6ToJ0b5D9aNuX7DiZjx4oYQ3Pcw",
-  authDomain: "mensajeria-ves.firebaseapp.com",
-  projectId: "mensajeria-ves",
-  storageBucket: "mensajeria-ves.appspot.com",
-  messagingSenderId: "558274527099",
-  appId: "1:558274527099:web:ebd517b294f7571e2247de",
-  databaseURL: "https://mensajeria-ves-default-rtdb.firebaseio.com/"
+  apiKey: "AIzaSyDI2-z8Jxm2MqhcfCkyCAiB96f3X_elUQk",
+  authDomain: "prueba-a115d.firebaseapp.com",
+  projectId: "prueba-a115d",
+  storageBucket: "prueba-a115d.appspot.com",
+  messagingSenderId: "839505184409",
+  appId: "1:839505184409:web:b1c240cf3aefe3fe735a08",
+  databaseURL: "https://prueba-a115d-default-rtdb.firebaseio.com/"
 };
 
 // Initialize Firebase

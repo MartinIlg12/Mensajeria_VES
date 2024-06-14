@@ -1,32 +1,33 @@
 import React from 'react';
-import { View } from 'react-native';
-import { IconButton, Text } from 'react-native-paper';
-import { styles } from '../../../theme/styles';
+import { View, Text, TouchableOpacity } from 'react-native';
+import { IconButton } from 'react-native-paper';
 import { Message } from '../HomeScreen';
 import { CommonActions, useNavigation } from '@react-navigation/native';
+import { styles } from '../../../theme/styles';
 
-//Interface props
 interface Props {
     message: Message;
 }
 
-export const MessageCardComponent = ({message}: Props) => {
+export const MessageCardComponent = ({ message }: Props) => {
+    const navigation = useNavigation();
 
-    const navigation=useNavigation();
+    const handleNavigateToDetail = () => {
+        navigation.dispatch(CommonActions.navigate({ name: 'Detail', params: { message } }));
+    };
 
     return (
-        <View style={styles.rootMessage}>
-            <View>
-                <Text variant='labelLarge'>Para: {message.to} </Text>
-                <Text variant='bodyMedium'>Asunto: {message.subject}</Text>
+        <TouchableOpacity style={styles.card} onPress={handleNavigateToDetail}>
+            <View style={styles.cardContent}>
+                <Text style={styles.cardLabel}>De: {message.email}</Text>
+                <Text style={styles.cardMessage}>Mensaje: {message.message}</Text>
             </View>
-            <View style={styles.iconEnd}>
-                <IconButton
-                    icon="email-open"
-                    size={25}
-                    onPress={() => navigation.dispatch(CommonActions.navigate({name:'Detail', params:{message}}))}
-                />
-            </View>
-        </View>
-    )
-}
+            <IconButton
+                icon="eye"
+                size={25}
+                style={styles.cardIcon}
+                onPress={handleNavigateToDetail}
+            />
+        </TouchableOpacity>
+    );
+};

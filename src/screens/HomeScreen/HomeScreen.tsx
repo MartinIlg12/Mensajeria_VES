@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react'
-import { FlatList, View } from 'react-native'
-import { Avatar, Button, Divider, FAB, IconButton, Modal, Portal, Text, TextInput } from 'react-native-paper'
-import { styles } from '../../theme/styles'
+import React, { useEffect, useState } from 'react';
+import { FlatList, View } from 'react-native';
+import { Avatar, Button, Divider, FAB, IconButton, Modal, Portal, Text, TextInput } from 'react-native-paper';
+import { styles } from '../../theme/styles';
 import firebase, { signOut, updateProfile } from 'firebase/auth';
 import { auth, dbRealTime } from '../../configs/firebaseConfig';
 import { MessageCardComponent } from './components/MessageCardComponent';
@@ -9,94 +9,92 @@ import { NewMessageComponent } from './components/NewMessageComponent';
 import { onValue, ref } from 'firebase/database';
 import { CommonActions, useNavigation } from '@react-navigation/native';
 
-//Interface - formulario perfil
+
 interface FormUser {
     name: string;
 }
 
-//Interface - Message
+
 export interface Message {
     id: string;
-    to: string;
-    subject: string;
+    email: string;  
     message: string;
 }
 
 export const HomeScreen = () => {
 
-    //hook useState: manipular el formulario del perfil de usuario
+    
     const [formUser, setFormUser] = useState<FormUser>({
         name: ''
     });
 
-    //hook useState: capturar la data del usuario logueado
+    
     const [userAuth, setUserAuth] = useState<firebase.User | null>(null);
 
-    //hook useState: lista de mensajes
+    
     const [messages, setMessages] = useState<Message[]>([]);
 
-    //useEffect: capturar la data del usuario autenticado
+    
     useEffect(() => {
-        //Obtener la data del usuario autenticado
+        
         setUserAuth(auth.currentUser);
-        //console.log(auth.currentUser);
-        setFormUser({ name: auth.currentUser?.displayName ?? "" })
-        //Función para listar mensajes
+        setFormUser({ name: auth.currentUser?.displayName ?? "" });
+        
         getAllMessages();
     }, []);
 
-    //hook useState: mostrar u ocultar el modal del perfil
+    
     const [showModalProfile, setShowModalProfile] = useState<boolean>(false);
 
-    //hook useState: mostrar u ocultar el modal del message
+    
     const [showModalMessage, setShowModalMessage] = useState<boolean>(false);
 
-    //hook navegación
+    
     const navigation = useNavigation();
 
-    //Función para cambiar los datos del formulario
+    
     const handlerSetValues = (key: string, value: string) => {
-        setFormUser({ ...formUser, [key]: value })
-    }
+        setFormUser({ ...formUser, [key]: value });
+    };
 
-    //Función actualizar la data del usuario autenticado
+    
     const handlerUpdateUser = async () => {
         await updateProfile(userAuth!, {
             displayName: formUser.name
         });
         setShowModalProfile(false);
-    }
+    };
 
-    //Función para acceder a la data
+    
     const getAllMessages = () => {
-        //1. Refrencia a la BDD - tabla
-        const dbRef = ref(dbRealTime, 'messages/' + auth.currentUser?.uid);
-        //2. Consultamos a la BDD
+        
+        const dbRef = ref(dbRealTime, 'messages');
+        
         onValue(dbRef, (snapshot) => {
-            //3. Capturar la data
-            const data = snapshot.val(); // formato esperado
-            //CONTROLAR QUE LA DATA TENGA INFORMACIÓN
+            
+            const data = snapshot.val(); 
+            
             if (!data) return;
-            //4. Obtener keys de los mensajes
-            const getKeys = Object.keys(data);
-            //5. Crear un arreglo para almacenar los mensajes de la BDD
+            
             const listMessages: Message[] = [];
-            getKeys.forEach((key) => {
-                const value = { ...data[key], id: key }
-                listMessages.push(value);
-            })
-            //6. Almacenar en el arreglo del hook
+            Object.keys(data).forEach((userId) => {
+                const userMessages = data[userId];
+                Object.keys(userMessages).forEach((key) => {
+                    const value = { ...userMessages[key], id: key }
+                    listMessages.push(value);
+                });
+            });
+            
             setMessages(listMessages);
-        })
-    }
+        });
+    };
 
-    //Función para cerrar sesión
+    
     const handlerSignOut = async () => {
         await signOut(auth);
-        //resetear las rutas
-        //navigation.dispatch(CommonActions.navigate({ name: 'Login' }));
-        navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Login' }] }))
-    }
+        
+        navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: 'Login' }] }));
+    };
 
     return (
         <>
@@ -104,7 +102,7 @@ export const HomeScreen = () => {
                 <View style={styles.header}>
                     <Avatar.Text size={55} label="MI" />
                     <View>
-                        <Text variant='bodySmall'>Bienvenida</Text>
+                        <Text variant='bodySmall'>Bienvenido</Text>
                         <Text variant='labelLarge'>{userAuth?.displayName}</Text>
                     </View>
                     <View style={styles.iconEnd}>
@@ -164,5 +162,5 @@ export const HomeScreen = () => {
             />
             <NewMessageComponent showModalMessage={showModalMessage} setShowModalMessage={setShowModalMessage} />
         </>
-    )
-}
+    );
+};
