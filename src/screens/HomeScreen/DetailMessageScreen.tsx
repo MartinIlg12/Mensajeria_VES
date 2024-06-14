@@ -29,13 +29,13 @@ export const DetailMessageScreen = () => {
     };
 
     const handlerUpdateMessage = async () => {
-        const dbRef = ref(dbRealTime, 'messages/' + editFormMessage.id);
+        const dbRef = ref(dbRealTime, 'messages/' +  auth.currentUser?.uid +'/'+ editFormMessage.id);
         await update(dbRef, { message: editFormMessage.message });
         navigation.goBack();
     };
 
     const handlerDeleteMessage = async () => {
-        const dbRef = ref(dbRealTime, 'messages/' + editFormMessage.id);
+        const dbRef = ref(dbRealTime, 'messages/' +  auth.currentUser?.uid + '/' + editFormMessage.id);
         await remove(dbRef);
         navigation.goBack();
     };
